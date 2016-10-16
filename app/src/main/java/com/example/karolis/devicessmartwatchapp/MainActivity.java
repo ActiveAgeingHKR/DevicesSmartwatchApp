@@ -1,28 +1,25 @@
 package com.example.karolis.devicessmartwatchapp;
 
 import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
+import android.hardware.*;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class MainActivity extends WearableActivity implements SensorEventListener {
 
     private static final SimpleDateFormat AMBIENT_DATE_FORMAT =
             new SimpleDateFormat("HH:mm", Locale.US);
-    public final String TAG = "main_activity";
+    public final String TAG = "MainActivity";
+
+    //Defines how sensitive accelerometer is for detecting when the person fell. The higher the number the less sensitive it is.
+    private final int ACCELEROMETER_SENSITIVITY = 15;
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer, mheartRate;
@@ -81,15 +78,15 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     public void onSensorChanged(SensorEvent sensorEvent) {
         Sensor sensor = sensorEvent.sensor;
         if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            if (sensorEvent.values[0] > 15) {
-                Toast.makeText(this, "PERSON FELL", Toast.LENGTH_SHORT).show();
-                new AsyncServer().execute("Client FELL " + String.valueOf(sensorEvent.values[0]));
-                Log.i("akselerometras", String.valueOf(sensorEvent.values[0]));
+            //TODO add values[1] and values[2] to accelerometer readings
+            if (sensorEvent.values[0] > ACCELEROMETER_SENSITIVITY) {
+                Log.i("Accelerometer data: ", String.valueOf(sensorEvent.values[0]));
+                new AsyncServer().execute("Cusomer FELL " + String.valueOf(sensorEvent.values[0]));
             }
         }
         if (sensor.getType() == Sensor.TYPE_HEART_RATE){
-            Log.i(TAG, "heart rate 0" + sensorEvent.values[0]);
-            new AsyncServer().execute("HeartRate " + String.valueOf(sensorEvent.values[0]));
+            Log.i(TAG, "HeartRate: " + sensorEvent.values[0]);
+            new AsyncServer().execute("HeartRate: " + String.valueOf(sensorEvent.values[0]));
         }
     }
 
