@@ -20,6 +20,7 @@ public class AsyncServer extends AsyncTask<String, Void, String> {
     }
 
     protected void onPostExecute(String feed) {
+
         Log.i(TAG, "Async send finished");
     }
 

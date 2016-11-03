@@ -17,35 +17,43 @@ public class Customer extends Person {
     }
 
 
-    public int getCustomerID() {
+    public int getCustomerID(){
+
         return customerID;
     }
 
     public void setCustomerID(int customerID) {
+
         this.customerID = customerID;
     }
 
     public String getWarning() {
+
         return warning;
     }
 
     public void setWarning(String warning) {
+
         this.warning = warning;
     }
 
-    public float getHeartRate() {
+    public float getHeartRate()
+    {
         return heartRate;
     }
 
-    public void setHeartRate(float heartRate) {
+    public void setHeartRate(float heartRate)
+    {
         this.heartRate = heartRate;
     }
 
-    public float getAccelerometerData() {
+    public float getAccelerometerData()
+    {
         return accelerometerData;
     }
 
     public void setAccelerometerData(float accelerometerData) {
+
         this.accelerometerData = accelerometerData;
     }
 }

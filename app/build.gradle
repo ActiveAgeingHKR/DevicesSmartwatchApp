@@ -24,4 +24,5 @@ dependencies {
     compile 'com.google.android.gms:play-services-wearable:9.6.1'
     provided 'com.google.android.wearable:wearable:2.0.0-alpha3'
     compile files('libs/gson-2.8.0.jar')
+    compile 'com.google.code.gson:gson:2.2.4'
 }
