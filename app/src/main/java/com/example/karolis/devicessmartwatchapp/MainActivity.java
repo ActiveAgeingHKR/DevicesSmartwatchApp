@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +28,10 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     //Defines how sensitive accelerometer is for detecting when the person fell. The higher the number the less sensitive it is.
     private final int ACCELEROMETER_SENSITIVITY = 15;
+
+    //TODO add these id's on first time setup of a device
     private final int CUSTOMER_ID = 151515;
+    private final int DEVICE_ID = 001;
 
     private SensorManager mSensorManager;
     private Sensor mAccelerometer, mheartRate;
@@ -99,25 +103,27 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         Sensor sensor = sensorEvent.sensor;
+        Timestamp timestamp = new Timestamp(new Date().getTime());
+
         if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             //TODO add values[1] and values[2] to accelerometer readings
             if (sensorEvent.values[0] > ACCELEROMETER_SENSITIVITY) {
                 Log.i("Accelerometer data: ", String.valueOf(sensorEvent.values[0]));
-                Incidents incidents = new Incidents(CUSTOMER_ID, "fell");
-                incidents.setNotes(sensorEvent.values[0]);
-                new AsyncServer().execute(createJsonString(incidents));
+                Incident incident = new Incident(CUSTOMER_ID, timestamp, Incident.Severity.MILD);
+                incident.setNotes("Customer fell. Accelerometer data: " + sensorEvent.values[0]);
+                new AsyncServer().execute(createJsonString(incident));
             }
         }
         if (sensor.getType() == Sensor.TYPE_HEART_RATE){
             Log.i(TAG, "HeartRate: " + sensorEvent.values[0]);
-            Incidents incidents = new Incidents(CUSTOMER_ID, "pulse");
-            incidents.setTime(sensorEvent.values[0]);
-            new AsyncServer().execute(createJsonString(incidents));
+            Incident incident = new Incident(CUSTOMER_ID, timestamp, Incident.Severity.NORMAL);
+            incident.setNotes("Heart rate: " + sensorEvent.values[0]);
+            new AsyncServer().execute(createJsonString(incident));
         }
     }
-    private String createJsonString(Incidents incidents) {
+    private String createJsonString(Incident incident) {
 
-        return new Gson().toJson(incidents);
+        return new Gson().toJson(incident);
     }
 
     @Override
