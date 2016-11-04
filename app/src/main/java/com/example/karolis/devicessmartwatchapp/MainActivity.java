@@ -103,20 +103,21 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             //TODO add values[1] and values[2] to accelerometer readings
             if (sensorEvent.values[0] > ACCELEROMETER_SENSITIVITY) {
                 Log.i("Accelerometer data: ", String.valueOf(sensorEvent.values[0]));
-                Customer customer = new Customer(CUSTOMER_ID, "fell");
-                customer.setAccelerometerData(sensorEvent.values[0]);
-                new AsyncServer().execute(createJsonString(customer));
+                Incidents incidents = new Incidents(CUSTOMER_ID, "fell");
+                incidents.setNotes(sensorEvent.values[0]);
+                new AsyncServer().execute(createJsonString(incidents));
             }
         }
         if (sensor.getType() == Sensor.TYPE_HEART_RATE){
             Log.i(TAG, "HeartRate: " + sensorEvent.values[0]);
-            Customer customer = new Customer(CUSTOMER_ID, "pulse");
-            customer.setHeartRate(sensorEvent.values[0]);
-            new AsyncServer().execute(createJsonString(customer));
+            Incidents incidents = new Incidents(CUSTOMER_ID, "pulse");
+            incidents.setTime(sensorEvent.values[0]);
+            new AsyncServer().execute(createJsonString(incidents));
         }
     }
-    private String createJsonString(Customer customer){
-        return new Gson().toJson(customer);
+    private String createJsonString(Incidents incidents) {
+
+        return new Gson().toJson(incidents);
     }
 
     @Override

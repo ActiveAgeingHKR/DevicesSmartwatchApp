@@ -39,16 +39,17 @@ public class Customer extends Person {
 
     public float getHeartRate()
     {
+
         return heartRate;
     }
 
-    public void setHeartRate(float heartRate)
-    {
+    public void setHeartRate(float heartRate) {
+
         this.heartRate = heartRate;
     }
 
-    public float getAccelerometerData()
-    {
+    public float getAccelerometerData() {
+
         return accelerometerData;
     }
 
