@@ -30,9 +30,10 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     private final int ACCELEROMETER_SENSITIVITY = 15;
 
     //TODO add these id's on first time setup of a device
-    private final int CUSTOMER_ID = 151515;
+    private final int CUSTOMER_ID = 1;
     private final int DEVICE_ID = 001;
 
+    private float heartRate;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer, mheartRate;
     private BoxInsetLayout mContainerView;
@@ -49,7 +50,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         setAmbientEnabled();
 
         //TODO  instead "1515" we must retrieve Customer id which will be saved after first time device setup
-        customer = new Customers(1515);
+        customer = new Customers(CUSTOMER_ID);
 
         mContainerView = (BoxInsetLayout) findViewById(R.id.container);
         mTextView = (TextView) findViewById(R.id.text);
@@ -74,7 +75,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             mContainerView.setBackgroundColor(getResources().getColor(android.R.color.black));
             mTextView.setTextColor(getResources().getColor(android.R.color.white));
             mClockView.setVisibility(View.VISIBLE);
-            mClockView.setText(AMBIENT_DATE_FORMAT.format(new Date()));
+            mClockView.setText(String.valueOf(heartRate));
         } else {
             mContainerView.setBackground(null);
             mTextView.setTextColor(getResources().getColor(android.R.color.black));
@@ -119,6 +120,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             }
         }
         if (sensor.getType() == Sensor.TYPE_HEART_RATE){
+            heartRate = sensorEvent.values[0];
             Log.i(TAG, "HeartRate: " + sensorEvent.values[0]);
             Incidents incidents = new Incidents(null, date.toString(), "NORMAL", customer);
             incidents.setInNotes("Heart rate: " + sensorEvent.values[0]);

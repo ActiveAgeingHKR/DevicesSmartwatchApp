@@ -22,22 +22,14 @@ public class Client {
 
     private Socket clientSocket = null;
     private BufferedWriter outputToServer = null;
-    private PrintWriter pw =null;
 
     public void establishContact() {
         Log.i(TAG, "Connection initiated");
         try {
             clientSocket = new Socket(InetAddress.getByName(KAROLIS_IP), PORT);
             outputToServer = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-           //pw = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream()), true);
-            //pw = new PrintWriter(clientSocket.getOutputStream());
-
             Log.i(TAG, "Connection established");
-           // Log.e("TCP Client", "C: Sent.");
-            //Log.e("TCP Client", "C: Done.");
         } catch (IOException e) {
-            out.println(e);
-            Log.e("TCP", "S: Error in connection", e);
             e.printStackTrace();
             Log.i(TAG, "Connection rejected");
         }
@@ -47,7 +39,6 @@ public class Client {
     public void send(String text) {
         try {
             outputToServer.write(text + "\r\n");
-            //pw.write(text + "\r\n");
             outputToServer.flush();
             Log.i(TAG, "Message sent.");
 
