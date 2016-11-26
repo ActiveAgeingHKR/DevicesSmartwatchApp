@@ -10,7 +10,6 @@ public class AsyncServer extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... params) {
 
         try {
-            Log.i(TAG, "Async send started");
             sendData(params[0]);
             return null;
         } catch (Exception e) {
@@ -21,7 +20,6 @@ public class AsyncServer extends AsyncTask<String, Void, String> {
 
     protected void onPostExecute(String feed) {
 
-        Log.i(TAG, "Async send finished");
     }
 
     public void sendData(String text){

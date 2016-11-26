@@ -14,9 +14,12 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
+import java.io.File;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends WearableActivity implements SensorEventListener {
@@ -25,6 +28,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             new SimpleDateFormat("HH:mm", Locale.US);
     public final String TAG = "MainActivity";
     private static final long AMBIENT_INTERVAL_MS = TimeUnit.SECONDS.toMillis(1);
+    public static final int HEARTBEAT_PERIOD = 10; //seconds
 
     //Defines how sensitive accelerometer is for detecting when the person fell. The higher the number the less sensitive it is.
     private final int ACCELEROMETER_SENSITIVITY = 15;
@@ -67,6 +71,9 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                 0,
                 ambientStateIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
+
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(new HearbeatToProxy(), 0, HEARTBEAT_PERIOD, TimeUnit.SECONDS);
     }
 
     private void refreshDisplayAndSetNextUpdate() {
@@ -109,22 +116,28 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     public void onSensorChanged(SensorEvent sensorEvent) {
         Sensor sensor = sensorEvent.sensor;
         Date date = new Timestamp(new Date().getTime());
+        Incidents incidents = null;
 
         if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             //TODO add values[1] and values[2] to accelerometer readings
             if (sensorEvent.values[0] > ACCELEROMETER_SENSITIVITY) {
                 Log.i("Accelerometer data: ", String.valueOf(sensorEvent.values[0]));
-                Incidents incidents = new Incidents(null, date.toString(), "MILD", customer);
+                incidents = new Incidents(null, date.toString(), "MILD", customer);
                 incidents.setInNotes("Customer fell. Accelerometer data: " + sensorEvent.values[0]);
-                new AsyncServer().execute(createJsonString(incidents));
             }
         }
         if (sensor.getType() == Sensor.TYPE_HEART_RATE){
             heartRate = sensorEvent.values[0];
             Log.i(TAG, "HeartRate: " + sensorEvent.values[0]);
-            Incidents incidents = new Incidents(null, date.toString(), "NORMAL", customer);
+            incidents = new Incidents(null, date.toString(), "NORMAL", customer);
             incidents.setInNotes("Heart rate: " + sensorEvent.values[0]);
+        }
+
+        if(incidents!=null && HearbeatToProxy.proxyIsAlive) {
+            Log.i(TAG, String.valueOf(HearbeatToProxy.proxyIsAlive));
             new AsyncServer().execute(createJsonString(incidents));
+        } else if(incidents != null && !HearbeatToProxy.proxyIsAlive){
+            Log.i(TAG, String.valueOf(HearbeatToProxy.proxyIsAlive));
         }
     }
     private String createJsonString(Incidents incidents) {
