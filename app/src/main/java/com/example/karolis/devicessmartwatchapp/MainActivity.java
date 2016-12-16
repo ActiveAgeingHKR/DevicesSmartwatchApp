@@ -8,6 +8,7 @@ import android.hardware.*;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -74,6 +76,19 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(new HearbeatToProxy(), 0, HEARTBEAT_PERIOD, TimeUnit.SECONDS);
+    }
+
+    public String getDeviceSerialNr(){
+        String serial = null;
+        try {
+            Class<?> c = Class.forName("android.os.SystemProperties");
+            Method get = c.getMethod("get", String.class);
+            serial = (String) get.invoke(c, "ro.serialno");
+        } catch (Exception ignored) {
+            ignored.printStackTrace();
+        }
+        Log.i(TAG, "Serial " + serial);
+        return serial;
     }
 
     private void refreshDisplayAndSetNextUpdate() {
