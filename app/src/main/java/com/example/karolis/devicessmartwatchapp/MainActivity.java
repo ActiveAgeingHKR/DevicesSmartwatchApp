@@ -15,6 +15,12 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.HttpHostConnectException;
+import org.apache.http.impl.client.HttpClientBuilder;
+
 import java.io.File;
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
@@ -31,6 +37,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     public final String TAG = "MainActivity";
     private static final long AMBIENT_INTERVAL_MS = TimeUnit.SECONDS.toMillis(1);
     public static final int HEARTBEAT_PERIOD = 10; //seconds
+    public static final String GET_CUSTOMER_ID_URL ="";
 
     //Defines how sensitive accelerometer is for detecting when the person fell. The higher the number the less sensitive it is.
     private final int ACCELEROMETER_SENSITIVITY = 15;
@@ -76,6 +83,21 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(new HearbeatToProxy(), 0, HEARTBEAT_PERIOD, TimeUnit.SECONDS);
+    }
+
+    public int retrieveCustomerID(){
+        int customerID = -1;
+
+        try {
+            HttpClient httpClient = HttpClientBuilder.create().build();
+            HttpGet post = new HttpGet(GET_CUSTOMER_ID_URL);
+            HttpResponse response = httpClient.execute(post);
+            //TODO get response (customer ID) and save it
+
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return customerID;
     }
 
     public String getDeviceSerialNr(){
