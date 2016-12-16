@@ -25,5 +25,4 @@ dependencies {
     provided 'com.google.android.wearable:wearable:2.0.0-alpha3'
     compile files('libs/gson-2.8.0.jar')
     compile 'com.google.code.gson:gson:2.2.4'
-    compile files('libs/httpclient-4.5.2.jar')
 }

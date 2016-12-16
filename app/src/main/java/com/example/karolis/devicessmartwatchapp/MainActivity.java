@@ -14,13 +14,13 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
-
+/**
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.impl.client.HttpClientBuilder;
-
+**/
 import java.io.File;
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
@@ -84,7 +84,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(new HearbeatToProxy(), 0, HEARTBEAT_PERIOD, TimeUnit.SECONDS);
     }
-
+/**
     public int retrieveCustomerID(){
         int customerID = -1;
 
@@ -99,7 +99,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         }
         return customerID;
     }
-
+**/
     public String getDeviceSerialNr(){
         String serial = null;
         try {
@@ -172,8 +172,10 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         if(incidents!=null && HearbeatToProxy.proxyIsAlive) {
             Log.i(TAG, String.valueOf(HearbeatToProxy.proxyIsAlive));
+            MyLogger.sendLoggedIncidents(getApplicationContext());
             new AsyncServer().execute(createJsonString(incidents));
         } else if(incidents != null && !HearbeatToProxy.proxyIsAlive){
+            MyLogger.offline(createJsonString(incidents), getApplicationContext());
             Log.i(TAG, String.valueOf(HearbeatToProxy.proxyIsAlive));
         }
     }
