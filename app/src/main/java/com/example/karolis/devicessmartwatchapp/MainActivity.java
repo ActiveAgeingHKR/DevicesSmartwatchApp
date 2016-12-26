@@ -26,6 +26,7 @@ import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -42,9 +43,8 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     //Defines how sensitive accelerometer is for detecting when the person fell. The higher the number the less sensitive it is.
     private final int ACCELEROMETER_SENSITIVITY = 15;
 
-    //TODO add these id's on first time setup of a device
-    private final int CUSTOMER_ID = 1;
-    private final int DEVICE_ID = 001;
+    private String customerID;
+    private String deviceID;
 
     private float heartRate;
     private SensorManager mSensorManager;
@@ -62,8 +62,8 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         setContentView(R.layout.activity_main);
         setAmbientEnabled();
 
-        //TODO  instead "1515" we must retrieve Customer id which will be saved after first time device setup
-        customer = new Customers(CUSTOMER_ID);
+        //customer = new Customers(1);
+        firstTimeDeviceSetup();
 
         mContainerView = (BoxInsetLayout) findViewById(R.id.container);
         mTextView = (TextView) findViewById(R.id.text);
@@ -84,33 +84,35 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(new HearbeatToProxy(), 0, HEARTBEAT_PERIOD, TimeUnit.SECONDS);
     }
-/**
-    public int retrieveCustomerID(){
-        int customerID = -1;
 
-        try {
-            HttpClient httpClient = HttpClientBuilder.create().build();
-            HttpGet post = new HttpGet(GET_CUSTOMER_ID_URL);
-            HttpResponse response = httpClient.execute(post);
-            //TODO get response (customer ID) and save it
-
-        }catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return customerID;
+    public void firstTimeDeviceSetup(){
+        //retrieves customer id by sending its device id to proxy server
+        createCustomer();
     }
-**/
+
+    public void createCustomer(){
+        //TODO  instead "1515" we must retrieve Customer id which will be saved after first time device setup
+        try {
+            customerID = new AsyncCustomerID().execute(getDeviceSerialNr()).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        customer = new Customers(Integer.valueOf(customerID));
+    }
+
     public String getDeviceSerialNr(){
-        String serial = null;
         try {
             Class<?> c = Class.forName("android.os.SystemProperties");
             Method get = c.getMethod("get", String.class);
-            serial = (String) get.invoke(c, "ro.serialno");
+            deviceID = (String) get.invoke(c, "ro.serialno");
         } catch (Exception ignored) {
             ignored.printStackTrace();
         }
-        Log.i(TAG, "Serial " + serial);
-        return serial;
+        Log.i(TAG, "Serial " + deviceID);
+
+        return deviceID;
     }
 
     private void refreshDisplayAndSetNextUpdate() {
@@ -163,6 +165,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                 incidents.setInNotes("Customer fell. Accelerometer data: " + sensorEvent.values[0]);
             }
         }
+
         if (sensor.getType() == Sensor.TYPE_HEART_RATE){
             heartRate = sensorEvent.values[0];
             Log.i(TAG, "HeartRate: " + sensorEvent.values[0]);

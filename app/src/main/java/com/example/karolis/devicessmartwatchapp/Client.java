@@ -22,7 +22,7 @@ import static java.lang.System.out;
 public class Client {
     private static final String TAG = "Client";
     public static final int PORT = 12345;
-    private final String KAROLIS_IP = "192.168.1.75";
+    private final String KAROLIS_IP = "192.168.1.92";
 
     private Socket clientSocket = null;
     private BufferedWriter outputToServer = null;
@@ -62,6 +62,7 @@ public class Client {
             BufferedReader bufferedReaderInput = new BufferedReader(
                     new InputStreamReader(clientSocket.getInputStream()));
             message = bufferedReaderInput.readLine();
+            Log.i(TAG, "Message received: " + message);
         } catch (IOException e) {
             e.printStackTrace();
         }
