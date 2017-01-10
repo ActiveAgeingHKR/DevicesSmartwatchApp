@@ -91,7 +91,6 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     }
 
     public void createCustomer(){
-        //TODO  instead "1515" we must retrieve Customer id which will be saved after first time device setup
         try {
             customerID = new AsyncCustomerID().execute(getDeviceSerialNr()).get();
         } catch (InterruptedException e) {
@@ -158,8 +157,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         Incidents incidents = null;
 
         if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            //TODO add values[1] and values[2] to accelerometer readings
-            if (sensorEvent.values[0] > ACCELEROMETER_SENSITIVITY) {
+            if (personFell(sensorEvent)) {
                 Log.i("Accelerometer data: ", String.valueOf(sensorEvent.values[0]));
                 incidents = new Incidents(null, date.toString(), "MILD", customer);
                 incidents.setInNotes("Customer fell. Accelerometer data: " + sensorEvent.values[0]);
@@ -167,10 +165,12 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         }
 
         if (sensor.getType() == Sensor.TYPE_HEART_RATE){
-            heartRate = sensorEvent.values[0];
-            Log.i(TAG, "HeartRate: " + sensorEvent.values[0]);
-            incidents = new Incidents(null, date.toString(), "NORMAL", customer);
-            incidents.setInNotes("Heart rate: " + sensorEvent.values[0]);
+//            if(heartRateIsBad(sensorEvent)) {
+                heartRate = sensorEvent.values[0];
+                Log.i(TAG, "HeartRate: " + sensorEvent.values[0]);
+                incidents = new Incidents(null, date.toString(), "NORMAL", customer);
+                incidents.setInNotes("Heart rate: " + sensorEvent.values[0]);
+//            }
         }
 
         if(incidents!=null && HearbeatToProxy.proxyIsAlive) {
@@ -182,6 +182,29 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             Log.i(TAG, String.valueOf(HearbeatToProxy.proxyIsAlive));
         }
     }
+
+    private boolean personFell(SensorEvent sensorEvent){
+        boolean isFallen = false;
+        if (sensorEvent.values[0] > ACCELEROMETER_SENSITIVITY) {
+            isFallen = true;
+        }
+        if (sensorEvent.values[1] > ACCELEROMETER_SENSITIVITY) {
+            isFallen = true;
+        }
+        if (sensorEvent.values[2] > ACCELEROMETER_SENSITIVITY) {
+            isFallen = true;
+        }
+        return isFallen;
+    }
+
+    private boolean heartRateIsBad(SensorEvent sensorEvent){
+        boolean isDangerous = false;
+        if(sensorEvent.values[0] < 60 || sensorEvent.values[0] > 100){
+            isDangerous = true;
+        }
+        return isDangerous;
+    }
+
     private String createJsonString(Incidents incidents) {
         return new Gson().toJson(incidents);
     }
