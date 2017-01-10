@@ -67,7 +67,11 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         mContainerView = (BoxInsetLayout) findViewById(R.id.container);
         mTextView = (TextView) findViewById(R.id.text);
+        mTextView.setTextColor(getResources().getColor(android.R.color.black));
+        mTextView.setText(String.valueOf("0.0"));
+
         mClockView = (TextView) findViewById(R.id.clock);
+        mClockView.setVisibility(View.VISIBLE);
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -120,7 +124,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             mContainerView.setBackgroundColor(getResources().getColor(android.R.color.black));
             mTextView.setTextColor(getResources().getColor(android.R.color.white));
             mClockView.setVisibility(View.VISIBLE);
-            mClockView.setText(String.valueOf(heartRate));
+            mTextView.setText(String.valueOf(heartRate));
         } else {
             mContainerView.setBackground(null);
             mTextView.setTextColor(getResources().getColor(android.R.color.black));
@@ -167,6 +171,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         if (sensor.getType() == Sensor.TYPE_HEART_RATE){
 //            if(heartRateIsBad(sensorEvent)) {
                 heartRate = sensorEvent.values[0];
+            mTextView.setText(String.valueOf(heartRate));
                 Log.i(TAG, "HeartRate: " + sensorEvent.values[0]);
                 incidents = new Incidents(null, date.toString(), "NORMAL", customer);
                 incidents.setInNotes("Heart rate: " + sensorEvent.values[0]);

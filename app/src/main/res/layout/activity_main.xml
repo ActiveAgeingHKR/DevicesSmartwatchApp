@@ -14,13 +14,16 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|start"
         android:textColor="@android:color/white"
-        app:layout_box="all" />
+        app:layout_box="all"
+        android:text="Adjutus"
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="492dp"
-        android:text="Heart rate app"
-        app:layout_box="all" />
+        android:textAlignment="center"
+        app:layout_box="all"
+        android:textSize="36sp" />
 
 </android.support.wearable.view.BoxInsetLayout>
